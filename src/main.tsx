@@ -32,25 +32,36 @@ Devvit.addCustomPostType({
     name: 'Experience Post',
     height: 'regular',
     render: (_context) => {
-        const [counter, setCounter] = useState(0);
 
         return (
-            <vstack height="100%" width="100%" gap="medium" alignment="center middle">
-                <image
-                    url="logo.png"
-                    description="logo"
-                    imageHeight={256}
-                    imageWidth={256}
-                    height="48px"
-                    width="48px"
-                />
-                <text size="large">{`Click counter: ${counter}`}</text>
-                <button appearance="primary" onPress={() => setCounter((counter) => counter + 1)}>
-                Click me here!
-                </button>
+            <vstack height='100%' width='100%' gap='small' alignment='center middle' backgroundColor='#eeeee4' padding='small'>
+                {/* Letter pool area */}
+                <vstack height='25%' width='100%' backgroundColor='#0A1416' cornerRadius='small' padding='xsmall'>
+                    <text>Letter pool</text>
+                </vstack>
+
+                <hstack height='75%' width='100%' gap='small'>
+                    <TeamArea>
+                        <text>Team-A</text>
+                    </TeamArea>
+                    <TeamArea>
+                        <text>Team-B</text>
+                    </TeamArea>
+                </hstack>
             </vstack>
         );
     },
 });
 
 export default Devvit;
+
+// ====================================================================================
+// Aux components
+// ====================================================================================
+const TeamArea = ({ children }: { children: JSX.Element | JSX.Element[] }) => {
+    return (
+        <vstack height='100%' width='50%' backgroundColor='#0A1416' cornerRadius='small' padding='xsmall'>
+            {children}
+        </vstack>
+    );
+};
