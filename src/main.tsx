@@ -33,6 +33,24 @@ Devvit.addCustomPostType({
     height: 'regular',
     render: (_context) => {
 
+        const handleButtonClick = async () => {
+            if (!_context.userId) {
+                throw new Error('User ID is undefined.');
+            }
+
+            console.log('Context object', _context);
+            const user_details = await _context.reddit.getUserById(_context?.userId);
+            console.log('user details object', user_details);
+            console.log('username', user_details?.username);
+
+            /**
+             * To store the data:
+             * https://redis.io/docs/latest/develop/get-started/
+             * OR
+             * https://chatgpt.com/share/67468ebd-3358-8007-adc1-7d227cce8742
+             */
+        }
+
         return (
             <vstack height='100%' width='100%' gap='small' alignment='center middle' backgroundColor='#eeeee4' padding='small'>
                 {/* Letter pool area */}
@@ -43,6 +61,7 @@ Devvit.addCustomPostType({
                 <hstack height='75%' width='100%' gap='small'>
                     <TeamArea>
                         <text>Team-A</text>
+                        <button onPress={() => handleButtonClick()}>Click Me</button>
                     </TeamArea>
                     <TeamArea>
                         <text>Team-B</text>
