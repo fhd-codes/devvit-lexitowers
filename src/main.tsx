@@ -3,6 +3,7 @@ import { Devvit, useState } from '@devvit/public-api';
 
 Devvit.configure({
     redditAPI: true,
+    kvStore: true, // For enabling key-value storage.
 });
 
 // Add a menu item to the subreddit menu for instantiating the new experience post
@@ -29,42 +30,67 @@ Devvit.addMenuItem({
 
 // Add a post type definition
 Devvit.addCustomPostType({
-    name: 'Experience Post',
+    name: 'LexiTowers',
     height: 'regular',
     render: (_context) => {
-
-        const handleButtonClick = async () => {
-            if (!_context.userId) {
-                throw new Error('User ID is undefined.');
+        // State to hold the list of usernames
+        const [usernameList, setUsernameList] = useState<string[]>(async () => {
+            try {
+                // Fetch usernames from KV Store
+                const stored_usernames = (await _context.kvStore.get(`post-${_context.postId}-usernames`)) ?? [];
+                // Ensure it's an array of strings
+                if (Array.isArray(stored_usernames)) {
+                    return stored_usernames as string[];
+                }
+                return [];
+            } catch (error) {
+                console.error('Error fetching usernames from KV Store:', error);
+                return [];
             }
+        });
 
-            console.log('Context object', _context);
-            const user_details = await _context.reddit.getUserById(_context?.userId);
-            console.log('user details object', user_details);
-            console.log('username', user_details?.username);
+        // Handler for button click
+        const handleButtonClick = async () => {
+            try {
+                if (!_context.userId) {
+                    throw new Error('User ID is undefined.');
+                }
 
-            /**
-             * To store the data:
-             * https://redis.io/docs/latest/develop/get-started/
-             * OR
-             * https://chatgpt.com/share/67468ebd-3358-8007-adc1-7d227cce8742
-             */
-        }
+                // Fetch the user's details
+                const user_details = await _context.reddit.getUserById(_context.userId);
+                const new_username = user_details?.username;
 
+                if (new_username) {
+                    // Add the new username to the list
+                    const updated_usernames = [...(usernameList || []), new_username];
+
+                    // Update state and persist to KV Store
+                    setUsernameList(updated_usernames);
+                    await _context.kvStore.put(`post-${_context.postId}-usernames`, updated_usernames);
+                }
+            } catch (error) {
+                console.error('Error handling button click:', error);
+            }
+        };
+
+        // Render the UI
         return (
-            <vstack height='100%' width='100%' gap='small' alignment='center middle' backgroundColor='#eeeee4' padding='small'>
-                {/* Letter pool area */}
-                <vstack height='25%' width='100%' backgroundColor='#0A1416' cornerRadius='small' padding='xsmall'>
+            <vstack height="100%" width="100%" gap="small" alignment="center middle" backgroundColor="#eeeee4" padding="small" >
+                <vstack height="25%" width="100%" backgroundColor="#0A1416" cornerRadius="small" padding="xsmall" >
                     <text>Letter pool</text>
                 </vstack>
 
-                <hstack height='75%' width='100%' gap='small'>
+                <hstack height="75%" width="100%" gap="small">
                     <TeamArea>
                         <text>Team-A</text>
-                        <button onPress={() => handleButtonClick()}>Click Me</button>
+                        <button onPress={handleButtonClick}>Click Me</button>
                     </TeamArea>
+
                     <TeamArea>
                         <text>Team-B</text>
+                        {usernameList.map((username, index) => (
+                            <text>{username}</text>
+                        ))}
                     </TeamArea>
                 </hstack>
             </vstack>
