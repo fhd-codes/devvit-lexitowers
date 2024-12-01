@@ -1,6 +1,8 @@
 // Learn more at developers.reddit.com/docs
 import { Devvit, useState } from '@devvit/public-api';
 
+import LoadingScreen from "./screens/LoadingScreen.tsx";
+
 Devvit.configure({
     redditAPI: true,
     kvStore: true, // For enabling key-value storage.
@@ -17,12 +19,10 @@ Devvit.addMenuItem({
         await reddit.submitPost({
             title: 'LexiTower by fhd-codes!',
             subredditName: subreddit.name,
-            // The preview appears while the post loads
-            preview: (
-                <vstack height="100%" width="100%" alignment="middle center">
-                    <text size="large">Loading...</text>
-                </vstack>
-            ),
+            /* The preview appears while the post loads.
+             * Make change and add new post to see its change.
+            */
+            preview: ( <LoadingScreen /> ),
         });
         ui.showToast({ text: 'Created post!' });
     },
