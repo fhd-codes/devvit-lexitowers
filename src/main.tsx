@@ -37,7 +37,7 @@ Devvit.addCustomPostType({
     name: 'LexiTowers',
     height: 'tall',
     render: (_context) => {
-        const [page, setPage] = useState('how_to_play');
+        const [page, setPage] = useState('home');
 
         let current_page;
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - -
