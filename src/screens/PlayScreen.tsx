@@ -29,13 +29,21 @@ const TIMEBAR_COLORS = [
     'white', // 100%
 ];
 
-const PlayScreen = ({setPage}: PageProps) => {
+const PlayScreen = ({setPage, context}: PageProps) => {
+
+    const getUsername = async () => {
+        if (!context.userId) { return }
+        const user_details = await context.reddit.getUserById(context?.userId);
+        return user_details?.username || 'Player';
+    }
 
     const useResettableState = (initialValue: any) => {
         const [state, setState] = useState(initialValue);
         const resetState = () => setState(initialValue);
         return [state, setState, resetState];
     };
+
+    const [username, setUsername] = useState<any>(getUsername());
 
     const [gameTimer, setGameTimer] = useState(GAME_TIME_SEC);
     const [timeBarWidth, setTimeBarWidth] = useState<any>('100%');
@@ -246,8 +254,9 @@ const PlayScreen = ({setPage}: PageProps) => {
 
                         {/* User's brick */}
                         <zstack alignment="bottom center">
-                            <hstack padding="xsmall" backgroundColor="gray" border='thick' width='250px' alignment='center' cornerRadius='small'>
-                                <text size="xsmall" color='white' weight='bold'>SnippyMicrobe (points)</text>
+                            <hstack padding="xsmall" backgroundColor="#055711" border='thick' width='250px' alignment='center' cornerRadius='small' gap='small'>
+                                <text size="xsmall" color='white' weight='bold'>{username}</text>
+                                <text size="xsmall" color='white'>(points)</text>
                             </hstack>
                             <image
                                 url="fuzzyFingers.png"

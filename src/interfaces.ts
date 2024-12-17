@@ -1,5 +1,6 @@
 export interface PageProps {
     setPage: (page: string) => void;
+    context?: any;
 }
 export interface LetterTileProps {
     letter: string;

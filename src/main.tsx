@@ -9,7 +9,7 @@ import LeaderboardScreen from "./screens/LeaderboardScreen.tsx";
 
 Devvit.configure({
     redditAPI: true,
-    // TODO: Add redis support here.
+    redis: true,
 });
 
 // Adding a menu item to the subreddit menu for instantiating the new LexiTower post
@@ -41,19 +41,18 @@ Devvit.addCustomPostType({
 
         let current_page;
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
         switch (page) {
             case 'home':
                 current_page = <HomeScreen setPage={setPage} />;
                 break;
             case 'play':
-                current_page = <PlayScreen setPage={setPage} />;
+                current_page = <PlayScreen setPage={setPage} context={_context} />;
                 break;
             case 'how_to_play':
                 current_page = <HowToPlayScreen setPage={setPage} />;
                 break;
             case 'leaderboard':
-                current_page = <LeaderboardScreen setPage={setPage} />;
+                current_page = <LeaderboardScreen setPage={setPage} context={_context} />;
                 break;
             default:
                 current_page = <HomeScreen setPage={setPage} />;
