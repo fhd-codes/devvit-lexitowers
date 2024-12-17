@@ -191,6 +191,9 @@ const PlayScreen = ({setPage, context}: PageProps) => {
         if ( !valid_words.has( assembled_word.toLowerCase() ) ) {
             setFooterText( 'Entered word is not valid' );
             return;
+        } else if (-1 !== (lexiBricks.flat().findIndex(el => el === assembled_word))) {
+            setFooterText( 'This word is already made' );
+            return;
         };
 
         makeLexiBricks( assembled_word );
