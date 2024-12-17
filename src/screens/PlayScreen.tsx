@@ -13,7 +13,7 @@ import LetterTile from "../components/LetterTile.tsx";
 import GameCompletitionPopup from '../components/GameCompletitionPopup.tsx';
 
 const WORD_LENGTH = 6;
-const GAME_TIME_SEC = 150;
+const GAME_TIME_SEC = 130;
 
 /*
  * There can be a total of 7 layers, and each layer will
@@ -307,7 +307,7 @@ const PlayScreen = ({setPage}: PageProps) => {
             <vstack width='100%' height='4%' alignment='middle center'>
                 <hstack gap='small' alignment='center middle'>
                     <text size='small' color='black'>Time left:</text>
-                    <text weight='bold' color='black' outline='thin'>{secondsToTimeFormat(gameTimer)}</text>
+                    <text weight='bold' color='black'>{secondsToTimeFormat(gameTimer)}</text>
                 </hstack>
             </vstack>
         </vstack>
