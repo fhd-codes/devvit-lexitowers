@@ -1,7 +1,12 @@
-import shortUUID from 'short-uuid';
+const generateUUID = () => {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (char) {
+      const random = Math.random() * 16 | 0; // Random integer between 0 and 15
+      const value = char === 'x' ? random : (random & 0x3 | 0x8);
+      return value.toString(16); // Convert to hexadecimal
+    });
+  }
 
 const POOL_ROW_LENGTH = 5;
-
 export const generateRandomLetters = () => {
     /**
      * This function will generate an array of objects which contains:
@@ -13,7 +18,7 @@ export const generateRandomLetters = () => {
         const letter = String.fromCharCode(65 + Math.floor(Math.random() * 26)); // Generate a random uppercase letter
         return {
             letter, // Already uppercase
-            id: shortUUID.generate(), // Unique identifier
+            id: generateUUID(), // Unique identifier
             selected: false,
             score: Math.random() < 0.90 ? 1 : 2, // Randomly assigning score points
         };

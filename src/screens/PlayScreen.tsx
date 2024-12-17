@@ -2,20 +2,23 @@ import { Devvit, useState, useInterval } from '@devvit/public-api';
 
 import { PageProps } from "../interfaces.ts";
 import { GAME_CONTAINER } from "../global-constants.ts";
+import { valid_words } from '../helpers/words.ts'
 
 import {
     generateRandomLetters,
     secondsToTimeFormat,
-} from "../server/play-screen.helper.ts";
+} from "../helpers/play-screen.helper.ts";
 
 import LetterTile from "../components/LetterTile.tsx";
 import GameCompletitionPopup from '../components/GameCompletitionPopup.tsx';
 
 const WORD_LENGTH = 6;
-const GAME_TIME_SEC = 15;
+const GAME_TIME_SEC = 150;
 
-// There can be a total of 7 layers, and each layer will
-// have the following number of bricks.
+/*
+ * There can be a total of 7 layers, and each layer will
+ * have the following number of bricks.
+*/
 const BRICK_QTY_IN_LAYERS = [3, 2, 3, 3, 2, 4];
 
 const TIMEBAR_COLORS = [
@@ -47,6 +50,7 @@ const PlayScreen = ({setPage}: PageProps) => {
     );
 
     const [lexiBricks, setLexiBricks] = useState<Array<Array<string>>>([]);
+    const [footerText, setFooterText, resetFooterText] = useResettableState('');
 
     // ----------------------------------------
     // ------- Game timer logic --------------
@@ -133,22 +137,18 @@ const PlayScreen = ({setPage}: PageProps) => {
         // Marking letter as un-selected.
         markPoolLetterAsSelected(word_copy[letter_index], false);
         setWord([...word_copy]);
+        resetFooterText();
     }
 
     const clearWord = () => {
-        // Resetting the word array.
-        resetWord();
+        // Resetting the word array and footer text.
+        resetWord(); resetFooterText();
 
         // Clearing any selected pool letter
         const updated_pool_letters = [...lettersPool].map(subarray =>
             subarray.map((item: any) => ({...item, selected: false}))
         );
         setLettersPool(updated_pool_letters);
-    }
-
-    const isValidWord = ( assembled_word: string ) => {
-        // TODO: update this logic
-        return '' !== assembled_word;
     }
 
     const makeLexiBricks = (assembled_word: string) => {
@@ -168,15 +168,17 @@ const PlayScreen = ({setPage}: PageProps) => {
         }
 
         setLexiBricks([...bricks]);
-        resetWord();
+        resetWord(); resetFooterText();
         generateLetterPool();
     }
 
     const checkWord = () => {
         const assembled_word = word.map((el: any) => el.letter).join('');
-
-        if ( '' === assembled_word ) return;
-        // TODO: Add logic here to check the word from english dictionary.
+        // Checking if the assembled word is present in the valid words list.
+        if ( !valid_words.has( assembled_word.toLowerCase() ) ) {
+            setFooterText( 'Entered word is not valid' );
+            return;
+        };
 
         makeLexiBricks( assembled_word );
     }
@@ -185,16 +187,16 @@ const PlayScreen = ({setPage}: PageProps) => {
   // =================================
   return (
     <zstack width='100%' height='100%' alignment='center middle'>
-        <vstack width="100%" height="100%" padding="small">
-            <vstack width="100%" height="95%">
+        <vstack height="100%" width="100%" alignment="middle center" padding="medium">
+            <vstack height="100%" width={GAME_CONTAINER} alignment="middle" gap='small'>
                 {/* ****************************************************************************** */}
                 {/* Top control box */}
-                <hstack width="100%" height="7%" padding="xsmall">
+                <hstack width="100%" height="10%">
                     <hstack width="50%" height="100%" alignment="middle start">
-                        <Button text="Back" icon_name="home" size="small" onPress={() => setPage('home')}/>
+                        <button size='small' icon='home' onPress={() => setPage('home')}>Home</button>
                     </hstack>
                     <hstack width="50%" height="100%" alignment="middle end">
-                        <Button text="Refresh" icon_name="refresh" size="small" onPress={generateLetterPool}/>
+                        <button size='small' icon='refresh' appearance='primary' onPress={generateLetterPool}>Refresh letters</button>
                     </hstack>
                 </hstack>
 
@@ -203,7 +205,7 @@ const PlayScreen = ({setPage}: PageProps) => {
                 <vstack width="100%" height="20%" alignment="center middle">
                     <vstack width="100%" maxWidth={GAME_CONTAINER} height="100%">
                         <hstack width="100%" height="50%" gap="small" alignment="center middle">
-                            { lettersPool[0].map((pool_letter: any) => (
+                            { (lettersPool[0] ?? []).map((pool_letter: any) => (
                                 <LetterTile
                                     letter={pool_letter.letter}
                                     onPress={() => handlePoolLetterClick(pool_letter)}
@@ -214,7 +216,7 @@ const PlayScreen = ({setPage}: PageProps) => {
                             }
                         </hstack>
                         <hstack width="100%" height="50%" gap="small" alignment="center middle">
-                            { lettersPool[1].map((pool_letter: any) => (
+                            { (lettersPool[1] ?? []).map((pool_letter: any) => (
                                 <LetterTile
                                     letter={pool_letter.letter}
                                     onPress={() => handlePoolLetterClick(pool_letter)}
@@ -239,7 +241,7 @@ const PlayScreen = ({setPage}: PageProps) => {
 
                 {/* ****************************************************************************** */}
                 {/* Tower box */}
-                <vstack width="100%" height="55%" alignment='center middle'>
+                <vstack width="100%" height="50%" alignment='center middle'>
                     <vstack width={GAME_CONTAINER} height='100%' backgroundColor=""  alignment="bottom center">
 
                         {/* User's brick */}
@@ -256,11 +258,11 @@ const PlayScreen = ({setPage}: PageProps) => {
                         </zstack>
                         {/* User's brick - ends*/}
                         <vstack alignment="bottom center" padding='xsmall'>
-                            { lexiBricks.map((tower_layer: Array<string>, index) => (
+                            { (lexiBricks ?? []).map((tower_layer: Array<string>, index) => (
                                 <hstack>
-                                    {tower_layer.map((brick: string, index: number) => (
-                                        <hstack padding="small" backgroundColor="white" border='thick' minWidth='80px' alignment='center' cornerRadius='small'>
-                                            <text size="small" weight='bold'>{brick}</text>
+                                    {(tower_layer ?? []).map((brick: string, index: number) => (
+                                        <hstack padding="xsmall" backgroundColor="white" border='thin' borderColor='gray' minWidth='80px' alignment='center' cornerRadius='small'>
+                                            <text size="medium" weight='bold' color='black'>{brick}</text>
                                         </hstack>
                                     ))}
                                 </hstack>
@@ -273,7 +275,7 @@ const PlayScreen = ({setPage}: PageProps) => {
                 {/* Sandbox */}
                 <vstack width="100%" height="10%" alignment="center middle">
                     <hstack width="100%" maxWidth={GAME_CONTAINER} height="100%" gap="small" alignment="center middle">
-                        { word.map((letter: any, letter_index: number) => (
+                        { (word ?? []).map((letter: any, letter_index: number) => (
                             <LetterTile
                                 letter={letter.letter}
                                 onPress={() => handleWordLetterClick(letter_index)}
@@ -284,25 +286,28 @@ const PlayScreen = ({setPage}: PageProps) => {
 
                 {/* ****************************************************************************** */}
                 {/* Bottom Control box */}
-                <hstack height="10%" width="100%" padding="small">
-                    <hstack width="25%" height="100%" alignment="middle start">
-                        <Button text="Clear" size="small" onPress={clearWord} />
+                <hstack height="10%" width="100%">
+                    <hstack width="20%" height="100%" alignment="middle start">
+                        <button appearance='destructive' size='small' icon='clear' onPress={clearWord} />
                     </hstack>
-                    <hstack width="50%" height="100%" alignment="middle center">
-                        <text size='xsmall'>Make 3, 4, 5, or 6 letter words</text>
+                    <hstack width="55%" height="100%" alignment="middle center">
+                        { '' !== footerText && (
+                            <hstack padding='xsmall' backgroundColor='rgb(255,255,255, 0.7)' border='thin' borderColor='yellow' cornerRadius='small'>
+                                <text size='xsmall' weight='bold' color='black'>{ footerText }</text>
+                            </hstack>
+                        )}
                     </hstack>
                     <hstack width="25%" height="100%" alignment="middle end">
-                        <Button text="Check" size="small" onPress={checkWord} />
+                        <button appearance='primary' size='small' onPress={checkWord}>Check</button>
                     </hstack>
                 </hstack>
             </vstack>
-
             {/* ****************************************************************************** */}
             {/* Remaining timer clock */}
             <vstack width='100%' height='4%' alignment='middle center'>
                 <hstack gap='small' alignment='center middle'>
-                    <text size='small'>Remaining time: </text>
-                    <text weight='bold'>{secondsToTimeFormat(gameTimer)}</text>
+                    <text size='small' color='black'>Time left:</text>
+                    <text weight='bold' color='black' outline='thin'>{secondsToTimeFormat(gameTimer)}</text>
                 </hstack>
             </vstack>
         </vstack>
@@ -319,48 +324,3 @@ const PlayScreen = ({setPage}: PageProps) => {
 };
 
 export default PlayScreen;
-
-
-interface ButtonProps {
-    type?: 'primary' | 'secondary' | 'tertiary'; // Restrict type to valid keys
-    text: string;
-    icon_name?: any;
-    size?: 'large' | 'small';
-    onPress?: any;
-  }
-
-  const Button = ({ type = 'primary', text, icon_name = '', size='large', onPress }: ButtonProps) => {
-    const button_type: { primary: string; secondary: string; tertiary: string } = {
-      primary: 'blue',
-      secondary: 'black',
-      tertiary: 'white',
-    };
-
-    const text_color: { primary: string; secondary: string; tertiary: string } = {
-      primary: 'white',
-      secondary: 'white',
-      tertiary: 'black',
-    };
-
-    const button_size: { large: Devvit.Blocks.SizeString; small: Devvit.Blocks.SizeString; } = {
-      large: '250px',
-      small: '70px',
-    };
-
-    return (
-      <hstack
-        height="25px"
-        minWidth={button_size[size]}
-        gap="small"
-        padding="small"
-        alignment="center middle"
-        backgroundColor={button_type[type]}
-        onPress={onPress}
-      >
-        <text size="large" color={text_color[type]} weight="bold">{text}</text>
-        {('' !== icon_name) &&
-          <icon name={icon_name} color={text_color[type]} size="small"/>
-        }
-      </hstack>
-    );
-  };

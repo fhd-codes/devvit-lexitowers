@@ -3,9 +3,11 @@
  *
  * All the words that are less than 3 letters long OR more than 6 letters long
  * are filtered out.
+ *
+ * Set.has() provides O(1) time complexity.
 */
 
-export const valid_words = [
+export const valid_words = new Set([
     'aah',
     'aahed',
     'aahing',
@@ -41695,4 +41697,4 @@ export const valid_words = [
     'zythum',
     'zzzs',
     'zzz',
-];
+]);

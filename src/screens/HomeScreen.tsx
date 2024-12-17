@@ -8,7 +8,7 @@ const HomeScreen = ({setPage}: PageProps) => {
                 url="lexi-tower-logo.png"
                 imageWidth={220}
                 imageHeight={200}
-                description="Generative artwork: Fuzzy Fingers"
+                description="LexiTower logo"
             />
             <vstack width='100%' gap='small' alignment='center middle'>
                 <button width='100%' maxWidth='200px' appearance='primary' onPress={() => setPage('play')}>Play</button>

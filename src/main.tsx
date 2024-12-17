@@ -26,7 +26,7 @@ Devvit.addMenuItem({
             /* The preview appears while the post loads.
              * Make change and add new post to see its change.
             */
-            preview: ( <text>Loading</text> ),
+            preview: ( <LoadingScreen /> ),
         });
         ui.showToast({ text: 'Created post!' });
     },
