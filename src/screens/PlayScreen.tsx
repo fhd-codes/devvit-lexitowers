@@ -44,6 +44,7 @@ const PlayScreen = ({setPage, context}: PageProps) => {
     };
 
     const [username, setUsername] = useState<any>(getUsername());
+    const [score, setScore] = useState<number>(0);
 
     const [gameTimer, setGameTimer] = useState(GAME_TIME_SEC);
     const [timeBarWidth, setTimeBarWidth] = useState<any>('100%');
@@ -176,6 +177,10 @@ const PlayScreen = ({setPage, context}: PageProps) => {
         }
 
         setLexiBricks([...bricks]);
+
+        // Updating user score.
+        setScore( (current_score) => current_score + assembled_word.length );
+
         resetWord(); resetFooterText();
         generateLetterPool();
     }
@@ -256,7 +261,7 @@ const PlayScreen = ({setPage, context}: PageProps) => {
                         <zstack alignment="bottom center">
                             <hstack padding="xsmall" backgroundColor="#055711" border='thick' width='250px' alignment='center' cornerRadius='small' gap='small'>
                                 <text size="xsmall" color='white' weight='bold'>{username}</text>
-                                <text size="xsmall" color='white'>(points)</text>
+                                <text size="xsmall" color='white'>({score})</text>
                             </hstack>
                             <image
                                 url="fuzzyFingers.png"
